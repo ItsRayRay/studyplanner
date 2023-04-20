@@ -3,11 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 import os
 from dotenv import load_dotenv
+from langchain.llms import OpenAI
+
 
 #App object
 app = FastAPI()
 
-my_var = os.getenv('text_key')
+load_dotenv()
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 origins = ['http://localhost:5173']
@@ -48,3 +52,9 @@ async def receive_data(request: Request):
 @app.get("/")
 def read_root():
     return {"ping":"pong"}
+
+
+llm = OpenAI(temperature=0.9)
+
+text = "What would be a good company name for a company that makes colorful socks?"
+print(llm(text))
