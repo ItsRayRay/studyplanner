@@ -3,10 +3,12 @@
 	import { FileDropzone } from '@skeletonlabs/skeleton';
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
+	import { json } from '@sveltejs/kit';
 
-	$: subjectId = $page.params.subjectId;
 
 	let message = '';
+
+	$: subjectId = $page.params.subjectId;
 
 	function sendMessage() {
 		const messageObj = {
@@ -16,6 +18,12 @@
 		chatContent.push(messageObj);
 		chatContent = [...chatContent];
 		message = '';
+		console.log(subjectId)
+		console.log(chatContent)
+		const chatContentToString = JSON.stringify(chatContent)
+		console.log(chatContentToString)
+		localStorage.setItem(subjectId, chatContentToString)
+		
 	}
 
 	function handleKeyPress(event) {
@@ -24,7 +32,6 @@
 		}
 	}
 
-	//tutorial to make chat working : https://www.youtube.com/watch?v=uT7Y_W2GYxY
 
 	const confirm: ModalSettings = {
 		type: 'confirm',
@@ -39,41 +46,25 @@
 		modalStore.trigger(confirm);
 	}
 
-	let chatContent = [
-	{ name: 'AIBOT', message: 'testing it out' },
-	{ name: 'user', message: 'testing it out too' },
+	$: chatContent = [
+	{ name: 'AIBOT', message: 'Hello' },
+	{ name: 'user', message: 'World' },
 ];
 
-// Check if chatContent contains an object with name 'user'
-
-
- $: fetch('http://localhost:8000/', {
-  method: 'POST', // or any other HTTP method
-  headers: {
-    'Content-Type': 'application/json' // or other appropriate headers
-  },
-  body: JSON.stringify({ chatContent }) // convert chatContent to JSON string and pass as request body
-})
-.then((response) => {
-  // Handle response from backend
-  if (response.ok) {
-    // Handle success
-    console.log('Data sent successfully');
-  } else {
-    // Handle error
-    console.error('Error sending data:', response.statusText);
-  }
-})
-.catch((error) => {
-  // Handle fetch error
-  console.error('Error sending data:', error);
-});
 
 
 
+	$: chatObjString = localStorage.getItem(subjectId)
+	$: chatObj = JSON.parse(chatObjString)
+	
+	
+
+function func() {
+	console.log(chatObj)
+}
 </script>
 
-
+<button on:click={func}>oisdgoisdengoi</button>
 
 <div id="cardcontainer" class="card p-4">
 	<div id="chatcontainer" class="card p-4" style="overflow-y: scroll;">

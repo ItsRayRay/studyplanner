@@ -42,7 +42,6 @@
 
 	function loadSideBar() {
 		sideBarLinks = JSON.parse(localStorage.getItem('names')) || [];
-		console.log(sideBarLinks);
 	}
 
 	onMount(loadSideBar);
