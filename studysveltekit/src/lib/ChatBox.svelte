@@ -29,7 +29,6 @@
         message = ""
         chatContent = [...chatContent]
 
-        console.log(chatContent)
 
     }
 
