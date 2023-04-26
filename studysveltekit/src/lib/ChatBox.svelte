@@ -7,64 +7,65 @@
 
 
 	let message = '';
+    let chatContent = [];
 
-	$: subjectId = $page.params.subjectId;
+    // Get subjectId from $page.params.subjectId
+    let subjectId = '';
+    $: {
+        subjectId = $page.params.subjectId;
+    }
 
-	function sendMessage() {
-		const messageObj = {
-			name: 'user',
-			message: message
-		};
-		chatContent.push(messageObj);
-		chatContent = [...chatContent];
-		message = '';
-		console.log(subjectId)
-		console.log(chatContent)
-		const chatContentToString = JSON.stringify(chatContent)
-		console.log(chatContentToString)
-		localStorage.setItem(subjectId, chatContentToString)
-		
-	}
+    // Function to send message
+    function sendMessage() {
+        const messageObj = {
+            name: 'user',
+            message: message
+        };
+        const getLocalChat = localStorage.getItem(subjectId)
+        const getlocalChatToArray = JSON.parse(getLocalChat || '[]')
+        getlocalChatToArray.push(messageObj)
+        const setArraytoString = JSON.stringify(getlocalChatToArray)
+        localStorage.setItem(subjectId, setArraytoString)
+        message = ""
+        chatContent = [...chatContent]
 
-	function handleKeyPress(event) {
-		if (event.key === 'Enter') {
-			sendMessage();
-		}
-	}
+        console.log(chatContent)
 
+    }
 
-	const confirm: ModalSettings = {
-		type: 'confirm',
-		// Data
-		title: 'Please Confirm',
-		body: 'Save your question & AI response as a flashcard?',
-		// TRUE if confirm pressed, FALSE if cancel pressed
-		response: (r: boolean) => console.log('response:', r)
-	};
+    // Handle key press event
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
 
-	function handleModalSubmit() {
-		modalStore.trigger(confirm);
-	}
+    // Modal settings
+    const confirm: ModalSettings = {
+        type: 'confirm',
+        // Data
+        title: 'Please Confirm',
+        body: 'Save your question & AI response as a flashcard?',
+        // TRUE if confirm pressed, FALSE if cancel pressed
+        response: (r: boolean) => console.log('response:', r)
+    };
 
-	$: chatContent = [
-	{ name: 'AIBOT', message: 'Hello' },
-	{ name: 'user', message: 'World' },
-];
+    // Handle modal submit
+    function handleModalSubmit() {
+        modalStore.trigger(confirm);
+    }
 
+    // Get chat content from local storage and update chatContent array
+    $: {
+        const chatConentfromLocal = localStorage.getItem(subjectId)
+        const chatConentfromLocaltoArray = JSON.parse(chatConentfromLocal || '[]')
+        chatContent = chatConentfromLocaltoArray
+        console.log(chatContent)
+    }
 
-
-
-	$: chatObjString = localStorage.getItem(subjectId)
-	$: chatObj = JSON.parse(chatObjString)
 	
-	
-
-function func() {
-	console.log(chatObj)
-}
 </script>
 
-<button on:click={func}>oisdgoisdengoi</button>
 
 <div id="cardcontainer" class="card p-4">
 	<div id="chatcontainer" class="card p-4" style="overflow-y: scroll;">

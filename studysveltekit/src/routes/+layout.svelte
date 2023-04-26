@@ -12,6 +12,7 @@
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import Languagedropdown from '../lib/languagedropdown.svelte';
+	import { json } from '@sveltejs/kit';
 
 	$: sideBarLinks = [];
 
@@ -32,6 +33,10 @@
 				projects.push(r);
 				localStorage.setItem('names', JSON.stringify(projects));
 				sideBarLinks = [...sideBarLinks, r]
+				const initialChatmessage = [{ name: 'AIBOT', message: 'Hello ' + r }]
+				const initialChatmessageStringified = JSON.stringify(initialChatmessage)
+				localStorage.setItem(r, initialChatmessageStringified)
+				console.log(initialChatmessage)
 			}
 		}
 	};
