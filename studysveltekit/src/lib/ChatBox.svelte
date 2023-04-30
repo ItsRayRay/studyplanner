@@ -5,6 +5,8 @@
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
 	import { json } from '@sveltejs/kit';
 
+	export let lastMessageFromChat = []
+
 
 	let message = '';
     let chatContent = [];
@@ -63,8 +65,29 @@
     }
 
 	
-</script>
+	function getLastChatMessage() {
+ 	 const items = localStorage.getItem(subjectId);
+ 	 const itemsstringified = JSON.parse(items);
+ 	 const lastItem = itemsstringified[itemsstringified.length - 1];
+ 	
+		if (lastItem.name === "user") {
+			return lastItem
+		}
 
+	}
+
+
+	function runBothFunctions() {
+		sendMessage()
+		getLastChatMessage()	
+		lastMessageFromChat.push(getLastChatMessage().message)
+		console.log(lastMessageFromChat)
+	}
+
+
+		
+	
+</script>
 
 <div id="cardcontainer" class="card p-4">
 	<div id="chatcontainer" class="card p-4" style="overflow-y: scroll;">
@@ -119,7 +142,7 @@
 			bind:value={message}
 			on:keypress={handleKeyPress}
 		/>
-		<button type="button" class="btn btn-xl variant-filled flex-item" on:click={sendMessage}
+		<button type="button" class="btn btn-xl variant-filled flex-item" on:click={runBothFunctions}
 			>Send</button
 		>
 	</div>
