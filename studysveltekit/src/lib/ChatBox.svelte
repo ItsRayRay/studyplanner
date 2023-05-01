@@ -3,9 +3,25 @@
 	import { FileDropzone } from '@skeletonlabs/skeleton';
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
-	import { json } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
 
-	export let lastMessageFromChat = []
+	 let lastMessageFromChat = []
+	 
+	 let helloWorld = "momo"
+
+	 async function handleClick() {
+    const response = await fetch('/api/Langchain', {
+      method: 'POST',
+      body: JSON.stringify({ message: lastMessageFromChat[0],
+	source: $page.params.subjectId })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+    }
+  }
+
 
 
 	let message = '';
@@ -80,14 +96,19 @@
 	function runBothFunctions() {
 		sendMessage()
 		getLastChatMessage()	
-		lastMessageFromChat.push(getLastChatMessage().message)
+		lastMessageFromChat.unshift(getLastChatMessage().message)
 		console.log(lastMessageFromChat)
+		handleApiSubmit()
 	}
 
 
 		
 	
 </script>
+
+<button on:click={handleClick}>Updatemessage</button>
+
+<p>message</p>
 
 <div id="cardcontainer" class="card p-4">
 	<div id="chatcontainer" class="card p-4" style="overflow-y: scroll;">
