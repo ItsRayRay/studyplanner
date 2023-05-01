@@ -29,8 +29,6 @@ Full stack web app studyplanner
       translation, which is used for processing text data from PDF files and YouTube videos.</li>
     <li>ChatGPT API: An API that enables interactive chatbot functionality, which is integrated into the StudyPlanner
       app for interactive study sessions.</li>
-    <li>YouTube API: A widely used API for retrieving data from YouTube videos, such as video details, captions, and
-      transcripts.</li>
     <li>Spaced Repetition Learning: A learning technique that helps users learn and retain information more effectively
       by reviewing flashcards at spaced intervals, which is implemented in the flashcards feature of the app.</li>
   </ul>
