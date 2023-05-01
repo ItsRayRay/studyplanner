@@ -4,109 +4,115 @@
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
 
-	let lastMessageFromChat = []
+	let lastMessageFromChat = [];
 	let message = '';
-    $: chatContent = [];
-
+	$: chatContent = [];
+	let scrollToDiv: HTMLDivElement
 
 	async function handleClick() {
-    const response = await fetch('/api/Langchain', {
-      method: 'POST',
-      body: JSON.stringify({ message: lastMessageFromChat[0],
-	source: $page.params.subjectId })
-    });
+		const response = await fetch('/api/Langchain', {
+			method: 'POST',
+			body: JSON.stringify({ message: lastMessageFromChat[0], source: $page.params.subjectId })
+		});
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
+		if (response.ok) {
+			const data = await response.json();
+			console.log(data);
 
-	  chatContent.push(data)
-		console.log(chatContent)
-		const getLocalStorageAPI = localStorage.getItem(subjectId)
-		const getlocalStorageAPIToArray = JSON.parse(getLocalStorageAPI || '[]')
-		getlocalStorageAPIToArray.push(data)
-		const localStorageAPItoString = JSON.stringify(getlocalStorageAPIToArray)
-		localStorage.setItem(subjectId, localStorageAPItoString)
-		chatContent = [...chatContent]
-    }
-  }
-
-
-
-    // Get subjectId from $page.params.subjectId
-    let subjectId = '';
-    $: {
-        subjectId = $page.params.subjectId;
-    }
-
-    // Function to send message
-    function sendMessage() {
-        const messageObj = {
-            name: 'user',
-            message: message
-        };
-        const getLocalChat = localStorage.getItem(subjectId)
-        const getlocalChatToArray = JSON.parse(getLocalChat || '[]')
-        getlocalChatToArray.push(messageObj)
-        const setArraytoString = JSON.stringify(getlocalChatToArray)
-        localStorage.setItem(subjectId, setArraytoString)
-        message = ""
-        chatContent = [...chatContent]
+			chatContent.push(data);
+			console.log(chatContent);
+			const getLocalStorageAPI = localStorage.getItem(subjectId);
+			const getlocalStorageAPIToArray = JSON.parse(getLocalStorageAPI || '[]');
+			getlocalStorageAPIToArray.push(data);
+			const localStorageAPItoString = JSON.stringify(getlocalStorageAPIToArray);
+			localStorage.setItem(subjectId, localStorageAPItoString);
+			chatContent = [...chatContent];
+			scrollToBotton()
+		}
+	}
 
 
-    }
+	function scrollToBotton() {
+		setTimeout(function () {
+			scrollToDiv.scrollIntoView({
+				behavior: 'smooth', block: 'end', inline: 'nearest'
+			})
+		}, 100)
+	} 
 
-    // Handle key press event
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            sendMessage();
-        }
-    }
+	// Get subjectId from $page.params.subjectId
+	let subjectId = '';
+	$: {
+		subjectId = $page.params.subjectId;
+	}
 
-    // Modal settings
-    const confirm: ModalSettings = {
-        type: 'confirm',
-        // Data
-        title: 'Please Confirm',
-        body: 'Save your question & AI response as a flashcard?',
-        // TRUE if confirm pressed, FALSE if cancel pressed
-        response: (r: boolean) => console.log('response:', r)
-    };
+	// Function to send message
+	function sendMessage() {
+		const messageObj = {
+			name: 'user',
+			message: message
+		};
+		const getLocalChat = localStorage.getItem(subjectId);
+		const getlocalChatToArray = JSON.parse(getLocalChat || '[]');
+		getlocalChatToArray.push(messageObj);
+		const setArraytoString = JSON.stringify(getlocalChatToArray);
+		localStorage.setItem(subjectId, setArraytoString);
+		message = '';
+		chatContent = [...chatContent];
+	}
 
-    // Handle modal submit
-    function handleModalSubmit() {
-        modalStore.trigger(confirm);
-    }
+	// Handle key press event
+	function handleKeyPress(event) {
+		if (event.key === 'Enter') {
+			sendMessage();
+		getLastChatMessage();
+		lastMessageFromChat.unshift(getLastChatMessage().message);
+		handleClick();
+		scrollToBotton()
+		}
+	}
 
-    // Get chat content from local storage and update chatContent array
-    $: {
-        const chatConentfromLocal = localStorage.getItem(subjectId)
-        const chatConentfromLocaltoArray = JSON.parse(chatConentfromLocal || '[]')
-        chatContent = chatConentfromLocaltoArray
-        console.log(chatContent)
-    }
+	// Modal settings
+	const confirm: ModalSettings = {
+		type: 'confirm',
+		// Data
+		title: 'Please Confirm',
+		body: 'Save your question & AI response as a flashcard?',
+		// TRUE if confirm pressed, FALSE if cancel pressed
+		response: (r: boolean) => console.log('response:', r)
+	};
+
+	// Handle modal submit
+	function handleModalSubmit() {
+		modalStore.trigger(confirm);
+	}
+
+	// Get chat content from local storage and update chatContent array
+	$: {
+		const chatConentfromLocal = localStorage.getItem(subjectId);
+		const chatConentfromLocaltoArray = JSON.parse(chatConentfromLocal || '[]');
+		chatContent = chatConentfromLocaltoArray;
+		console.log(chatContent);
+	}
+
+	function getLastChatMessage() {
+		const items = localStorage.getItem(subjectId);
+		const itemsstringified = JSON.parse(items);
+		const lastItem = itemsstringified[itemsstringified.length - 1];
+
+		if (lastItem.name === 'user') {
+			return lastItem;
+		}
+	}
 
 	
-	function getLastChatMessage() {
- 	 const items = localStorage.getItem(subjectId);
- 	 const itemsstringified = JSON.parse(items);
- 	 const lastItem = itemsstringified[itemsstringified.length - 1];
- 	
-		if (lastItem.name === "user") {
-			return lastItem
-		}
-
-	}
-
-
 	function runBothFunctions() {
-		sendMessage()
-		getLastChatMessage()	
-		lastMessageFromChat.unshift(getLastChatMessage().message)
-		handleClick()
+		sendMessage();
+		getLastChatMessage();
+		lastMessageFromChat.unshift(getLastChatMessage().message);
+		handleClick();
+		scrollToBotton()
 	}
-
-
 </script>
 
 <div id="cardcontainer" class="card p-4">
@@ -150,6 +156,7 @@
 						</div>
 					{/if}
 				{/each}
+				<div class="" bind:this={scrollToDiv}></div>
 			</div>
 		</div>
 	</div>
@@ -205,6 +212,9 @@
 		min-height: 43vh;
 		max-height: 43vh;
 		margin-bottom: 1.8em;
+		overflow-y: scroll;
+  scroll-behavior: smooth;
+  scroll-margin-top: 9999px;
 	}
 
 	#chatbubble {
