@@ -3,13 +3,13 @@
 	import { FileDropzone } from '@skeletonlabs/skeleton';
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
 
-	 let lastMessageFromChat = []
-	 
-	 let helloWorld = "momo"
+	let lastMessageFromChat = []
+	let message = '';
+    $: chatContent = [];
 
-	 async function handleClick() {
+
+	async function handleClick() {
     const response = await fetch('/api/Langchain', {
       method: 'POST',
       body: JSON.stringify({ message: lastMessageFromChat[0],
@@ -19,13 +19,19 @@
     if (response.ok) {
       const data = await response.json();
       console.log(data);
+
+	  chatContent.push(data)
+		console.log(chatContent)
+		const getLocalStorageAPI = localStorage.getItem(subjectId)
+		const getlocalStorageAPIToArray = JSON.parse(getLocalStorageAPI || '[]')
+		getlocalStorageAPIToArray.push(data)
+		const localStorageAPItoString = JSON.stringify(getlocalStorageAPIToArray)
+		localStorage.setItem(subjectId, localStorageAPItoString)
+		chatContent = [...chatContent]
     }
   }
 
 
-
-	let message = '';
-    let chatContent = [];
 
     // Get subjectId from $page.params.subjectId
     let subjectId = '';
@@ -97,18 +103,11 @@
 		sendMessage()
 		getLastChatMessage()	
 		lastMessageFromChat.unshift(getLastChatMessage().message)
-		console.log(lastMessageFromChat)
-		handleApiSubmit()
+		handleClick()
 	}
 
 
-		
-	
 </script>
-
-<button on:click={handleClick}>Updatemessage</button>
-
-<p>message</p>
 
 <div id="cardcontainer" class="card p-4">
 	<div id="chatcontainer" class="card p-4" style="overflow-y: scroll;">
